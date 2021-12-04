@@ -7,7 +7,6 @@ use std::fs::File;
 use std::io::Error;
 use std::process;
 
-
 pub fn day1_challege1(config: &Config) -> Result<i32, Error> {
     let f = File::open(config.filename.clone()).unwrap_or_else(|err| {
         println!("Error opening file: {}", err);

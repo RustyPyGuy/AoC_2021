@@ -5,7 +5,7 @@
 use a_o_c::*;  //import lib module
 mod day1; use day1::*;  // Day 1
 mod day2; use day2::*;  // Day 2
-mod day3; use day3::*;  // Day 3
+// mod day3; use day3::*;  // Day 3
 use std::env;
 use std::process;
 
@@ -21,13 +21,10 @@ fn main() {
     match config.challenge {
         1 => { result.push(day1_challege1(&config).unwrap());
                result.push(day1_challenge2(&config).unwrap());},
-        _ => {println!("Invalid challenge input. Exiting"); process::exit(1);}
+        2 => { result.push(day2_challenge1(&config).unwrap());
+               result.push(day2_challenge2(&config).unwrap());},
+        _ => { println!("Invalid challenge input. Exiting"); process::exit(1);},
     };
-    // let result = match config.challenge {
-    //     1 => day1_challege1(config).unwrap(),
-    //     2 => day1_challenge2(config).unwrap(),
-    //     _ => {println!("Invalid challenge input. Exiting"); process::exit(1);}
-    // };
-    println!("The results for Day {} are\n\
+    println!("The results for Day {} are:\n\
         Challenge 1 result {}\nChallenge 2 result {}",config.challenge,result[0],result[1]);
 }
