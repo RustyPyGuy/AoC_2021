@@ -4,7 +4,7 @@
 use std::fs::File;
 // use std::error::Error;
 use std::io::{BufRead, BufReader, Error, ErrorKind, Read};
-// use std::process;
+use std::process;
 
 
 pub struct Config {
@@ -33,4 +33,11 @@ pub fn read_by_lines<R: Read>(io: R) -> Result<Vec<i32>, std::io::Error> {
     }
     Ok(v)
 }
-
+pub fn read_prep_puzzle_file/*<R: Read, T>*/(config: &Config) -> Result<std::io::BufReader<File>, Error> {
+    let f = File::open(config.filename.clone()).unwrap_or_else(|err| {
+        println!("Error opening file: {}", err);
+        process::exit(1);
+    });
+    let br = BufReader::new(f);
+    Ok(br)
+}
