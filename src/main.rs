@@ -6,6 +6,7 @@ use a_o_c::*;  //import lib module
 mod day1; use day1::*;  // Day 1
 mod day2; use day2::*;  // Day 2
 mod day3; use day3::*;  // Day 3
+mod day4; use day4::*;
 use std::env;
 use std::process;
 
