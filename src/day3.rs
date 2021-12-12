@@ -2,7 +2,7 @@
 use a_o_c::*;  //import custom lib.rs module
 // use std::fs::File;
 // use std::error::Error;
-use std::io::{BufRead, BufReader, Error, ErrorKind, Read};
+use std::io::{BufRead, Error };
 // use std::process;
 
 #[derive(Debug, Copy, Clone)]

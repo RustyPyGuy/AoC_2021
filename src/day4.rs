@@ -1,18 +1,121 @@
-// Advent of Code Day TEMPLATE
+// Advent of Code Day Day 4
 //
 // Some imports not needed every time.
 use a_o_c::*;  //import custom lib.rs module
-// use std::fs::File;
-// use std::error::Error;
-use std::io::{BufRead, BufReader, Error, ErrorKind, Read};
-// use std::process;
-use grid::*;
+use std::io::Error;
+use grid::*; //using a custom crate for once.
+
+
+pub fn day4_challenge1(config: &Config) -> Result<i32, Error> {
+    // read input puzzle file
+    let input_string = read_prep_puzzle_file_contents_to_string(config);
+    // read called numbers all on first line and assign to a vector.
+    let lines = iterate_by_lines_from_string(&input_string);
+    let called_numbers = parse_string_line_into_integers(lines.get(0).unwrap().to_string(),','); 
+    // build some bingo cards
+    let mut bingo_cards: Vec<BingoCard> = Vec::new();
+
+    for five_lines in lines[1..].chunks(5) {
+        let mut working_bingo_card = BingoCard::new().unwrap();
+        // println!("line: {:?}",five_lines);
+        // bingo_cards.push(BingoCard::new().unwrap());
+        // let mut index: usize = 0;
+        // for line in five_lines{
+        for (index, line) in five_lines.iter().enumerate() {
+            let row_int: Vec<u32> = line.split_whitespace().filter_map(|s| s.parse::<u32>().ok()).collect();
+            // println!("row_int:{:?}",row_int);
+            working_bingo_card.build_card_by_row(row_int,index);
+            // index += 1;
+        }
+       bingo_cards.push(working_bingo_card); 
+    }
+let mut is_winner: bool = false; 
+let mut winning_score: u32 =0;
+let mut sum_unmarked: u32 = 0;
+for called_number in &called_numbers {
+    // for one_card in bingo_cards.iter_mut() {
+    for (index,one_card) in bingo_cards.iter_mut().enumerate() {
+        is_winner= one_card.evaluate_one_called_number(*called_number);
+        if is_winner {
+            println!("we have a winner! number: {}\ncard number:{}\n{:?}",called_number,index,one_card);
+            let temp_vec = one_card.unmarked_numbers();
+            for number in temp_vec.iter(){
+                sum_unmarked += number;
+            } 
+            winning_score = sum_unmarked * called_number;
+            break;
+
+        }
+    }
+
+        if is_winner { break; }
+}
+    Ok(winning_score as i32)
+}
+
+pub fn day4_challenge2(config: &Config) -> Result<i32, Error> {
+    // read input puzzle file
+    let input_string = read_prep_puzzle_file_contents_to_string(config);
+    // read called numbers all on first line and assign to a vector.
+    let lines = iterate_by_lines_from_string(&input_string);
+    let called_numbers = parse_string_line_into_integers(lines.get(0).unwrap().to_string(),','); 
+    // build some bingo cards
+    let mut bingo_cards: Vec<BingoCard> = Vec::new();
+    for five_lines in lines[1..].chunks(5) {
+        let mut working_bingo_card = BingoCard::new().unwrap();
+        let mut index: usize = 0;
+        for line in five_lines{
+            let row_int: Vec<u32> = line.split_whitespace().filter_map(|s| s.parse::<u32>().ok()).collect();
+            working_bingo_card.build_card_by_row(row_int,index);
+            index += 1;
+        }
+       bingo_cards.push(working_bingo_card); 
+    }
+// println!("bingo_cards {:?}",bingo_cards);
+let mut index: usize = 0;
+let mut is_winner: bool = false; 
+let mut winning_score: u32 =0;
+let mut sum_unmarked: u32 = 0;
+for called_number in &called_numbers {
+    // for one_card in bingo_cards.iter_mut() {
+    for (index,one_card) in bingo_cards.iter_mut().enumerate() {
+        is_winner= one_card.evaluate_one_called_number(*called_number);
+        if is_winner {
+            println!("we have a winner! number: {}\ncard number:{}\n{:?}",called_number,index,one_card);
+            let temp_vec = one_card.unmarked_numbers();
+            for number in temp_vec.iter(){
+                sum_unmarked += number;
+            } 
+            winning_score = sum_unmarked * called_number;
+            break;
+
+        }
+    }
+    let mut winner_count: u32 = 0;
+    for (index,one_card) in bingo_cards.iter().enumerate() {
+        if is_winner { winner_count += 1; }
+        if winner_count == bingo_cards.len() as u32 -1{
+            
+            for (index,one_card) in bingo_cards.iter().enumerate() {
+                if !is_winner {
+                    sum_unmarked = 0;
+                    let temp_vec = one_card.unmarked_numbers();
+                    for number in temp_vec.iter(){
+                        sum_unmarked += number;
+                    } 
+                    winning_score = sum_unmarked * called_number;
+                    break;
+                    }
+                }
+            }
+        }
+    }
+    Ok(winning_score as i32)
+}
 
 #[derive(Debug, Clone)]
 pub struct BingoCard {
-// card: Grid<u32>, 
 card: Grid<MarkedNumber>, // Contains a vector grid of enums that indicate whether a number is marked.
-// winning_groups: Vec<Vec<u32>>,
 marked_numbers: Vec<u32>, // A vector that only contains marked numbers (somewhat redundant, but possibly useful)
 card_complete: bool,  // Stores state that the card is completely populated, again redundant.
 winning_exists: bool, // Stores state that the card is a winner based on marked numbers. 
@@ -21,58 +124,92 @@ winning_input_index: u32, // The number of numbers ingested for possible marking
 impl BingoCard {
     pub fn new() -> Result<BingoCard, &'static str>{
         let card = Grid::new(5,5);
-        // winning_groups: <Vec<u32>>,
         let marked_numbers = Vec::new();
         let card_complete = false;
         let winning_exists = false;
         let winning_input_index = 0;
         Ok(BingoCard{card,marked_numbers,card_complete,winning_exists,winning_input_index})
     }
-    pub fn build_card_by_row(mut self, input: Vec<u32>, row: usize) {
+    pub fn init() -> Result<BingoCard, &'static str>{
+        let card = Grid::init(5,5,MarkedNumber::None);
+        let marked_numbers = Vec::new();
+        let card_complete = false;
+        let winning_exists = false;
+        let winning_input_index = 0;
+        Ok(BingoCard{card,marked_numbers,card_complete,winning_exists,winning_input_index})
+    }
+    pub fn build_card_by_row(&mut self, input: Vec<u32>, row: usize) {
         let mut temp_row: Vec<MarkedNumber> = Vec::new();
         for number in input.iter(){
-            temp_row.push(MarkedNumber::UnMarked(*number)/*BingoCard::new_enum_unmarked_number(*number)*/);
+            temp_row.push(MarkedNumber::UnMarked(*number));
         }
-        self.card.insert_row(row, temp_row);
+        self.card.insert_row(row,temp_row );
+        self.card.pop_row();
     }
-    fn new_enum_unmarked_number(input: u32) -> MarkedNumber {
-       MarkedNumber::UnMarked(input)
-    }
-    pub fn evaluate_one_called_number(mut self, called_number: u32){
-        // THIS IS THE BUSINESS
+    pub fn evaluate_one_called_number(&mut self, called_number: u32) -> bool {
+        // THIS IS THE BUSINESS.  This is the heart of the program.
         // Start by looping through the elements and marking the called number.
-            for mut card_number in self.card.clone().iter() {
-                if card_number.clone().unwrap() == called_number {
-                    card_number = &MarkedNumber::Marked(called_number);
-                    // self.card = card_number;
-                    // let new_card_number = &MarkedNumber::Marked(*called_number); 
-                    // Add this number to the list of called and marked numbers.
-                    // NOTE: Need to check if this will act as designed.
+        //my orignial plan was to use an iterator, but that got to complicated for the
+        //reassignment of the row, column index. Sometimes old tried ways are the best.
+        for row in 0..5 {
+            for col in 0..5 {
+                if self.card[row][col].clone().unwrap() == called_number {
+                    self.card[row][col] = MarkedNumber::Marked(called_number);
                     self.marked_numbers.push(called_number);
-                } 
+                }
             }
-             // Increment the winning input index whether or not there's a win
+        }
+             // Increment the winning input index whether or not there's a win. This tracks the
+             // indext of the winning number.
             self.winning_input_index +=1;
             // evaluate if there's a winner
             // Go through the rows and columns and see if all have the correct enum value
             // Rows first
             for selected_row in 0..self.card.rows() {
+                self.winning_exists = true; // set the winning flag. It is assumed true to prepare logic comparisons.
                 for element in self.card.iter_row(selected_row){
                     if std::mem::discriminant(element) == 
                         std::mem::discriminant(&MarkedNumber::Marked(u32::MAX)) {
-                       self.winning_exists = true;  // NOTE: Broken compare logic need to fix.
+                       self.winning_exists &= true;  // assign self logic AND true
                        continue; // next iteration if true.
                     }
-                    // if any number in the row is not marked, we reset the winning marker. 
-                   self.winning_exists = false; 
+                    // if any number in the row is not marked this portion is executed.
+                    // The winning flag is set to false.  One false value will stick. 
+                   self.winning_exists &= false; // assign self logic AND false.
                 }
+            // If there is a winner with this row, stop evaluating and preserve the flag.
+            if self.winning_exists {return self.winning_exists;} // true
             }
-            // since we have a winner, stop evaluating.
-            if self.winning_exists {return;} // true
             // Columns next.
+            for selected_column in 0..self.card.cols() {
+                self.winning_exists = true; // set the winning flag. It is assumed true to prepare logic comparisons.
+                for element in self.card.iter_col(selected_column){
+                    if std::mem::discriminant(element) == 
+                        std::mem::discriminant(&MarkedNumber::Marked(u32::MAX)) {
+                       self.winning_exists &= true;  // assign self logic AND true
+                       continue; // next iteration if true.
+                    }
+                    // if any number in the row is not marked this portion is executed.
+                    // The winning flag is set to false.  One false value will stick. 
+                   self.winning_exists &= false; // assign self logic AND false.
+                }
+            // If there is a winner with this column, stop evaluating and preserve the flag.
+            if self.winning_exists {return self.winning_exists;} // true
+            }
+            return self.winning_exists;
     }
+    pub fn unmarked_numbers(&self) -> Vec<u32> {
+       let mut unmarked_numbers_list: Vec<u32> = Vec::new();
+           for element in self.card.iter() {
+                if std::mem::discriminant(element) == 
+                    std::mem::discriminant(&MarkedNumber::UnMarked(u32::MAX)) {
+                        unmarked_numbers_list.push(element.clone().unwrap());
+           }
+    }
+       unmarked_numbers_list
+    }
+
     pub fn export(self) -> Result<BingoCard, &'static str> {
-        // return Ok(Coordinates{self.x,self.y,self.z});
         println!("export method called returning struct {:?}",self);
         Ok(self)
     }
@@ -83,9 +220,6 @@ enum MarkedNumber {
     UnMarked(u32),
     None,
 }
-// pub trait Default {
-//     fn summarize(&self) -> String;
-// }
 impl Default for MarkedNumber {
     fn default() -> Self { MarkedNumber::None }
 }
@@ -94,29 +228,56 @@ impl MarkedNumber {
     match self {
         MarkedNumber::Marked(val) => val,
         MarkedNumber::UnMarked(val) => val,
-        MarkedNumber::None => u32::MAX, // Since this has to return a number. The only alternative is to panic.
-                                        //      Douglass Adams says "Don't Panic!"
-                                        //  The Rust way of doing would be to return an enum Result or
-                                        //  Option, but that would have to be unwrapped again. I'd prefer not
-                                        //  to do that right now.
+        MarkedNumber::None => u32::MAX, 
+        // Since this has to return a number. The only alternative is to panic.
+        //      Douglas Adams says "Don't Panic!"
+        //  The Rust way of doing would be to return an enum Result or
+        //  Option, but that would have to be unwrapped again. I'd prefer not
+        //  to do that right now.
         }
     }
 }
 
-pub fn day4_challenge1(config: &Config) -> Result<i32, Error> {
-    // let mut data_struct = DataStruct::new().unwrap();
-    // perform_calculations(config, &mut data_struct);
-    // println!("interim caluculations {:?}",data_struct);
-    // final calculations below
-    // Ok(data_struct.x*data_struct.y)
-    Ok(0)
-}
+#[cfg(test)]
+mod test {
+    use super::*;
 
-pub fn day4_challenge2(config: &Config) -> Result<i32, Error> {
-    // let mut data_struct = DataStruct::new().unwrap();
-    // perform_calculations(config, &mut data_struct);
-    // println!("interim caluculations {:?}",data_struct);
-    // final calculations below
-    // Ok(data_struct.x*data_struct.y)
-    Ok(0)
+    fn build_test_card() -> BingoCard {
+        let mut test_board: BingoCard = BingoCard::new().unwrap(); 
+        for i in 0..5 {
+            let fake_vec: Vec<u32> = vec![i*10+1,i*10+2,i*10+3,i*10+4,i*10+5];
+            test_board.build_card_by_row(fake_vec,i as usize); 
+        }
+        test_board
+    }
+
+    #[test]
+    fn build_one_board() {
+        let mut board: BingoCard = BingoCard::new().unwrap(); 
+        // let fake_vec: Vec<MarkedNumber> = vec![MarkedNumber::UnMarked(1);5];
+        for i in 0..5 {
+            let fake_vec: Vec<u32> = vec![i*10+1,i*10+2,i*10+3,i*10+4,i*10+5];
+            board.build_card_by_row(fake_vec,i as usize); 
+        }
+        println!("board {:?}", board.card);
+        // self.card.insert_row(row,fake_vec );
+        let test_col = board.card.pop_col().unwrap();
+        assert_eq!(test_col,vec![MarkedNumber::UnMarked(5),MarkedNumber::UnMarked(15),MarkedNumber::UnMarked(25),MarkedNumber::UnMarked(35),MarkedNumber::UnMarked(45)]);
+    }
+    
+    #[test]
+    fn winning_number_flagged() {
+       let mut board = build_test_card();
+       let mut winner: bool = false;
+        winner ^= board.evaluate_one_called_number(5); //exclusive or, XOR
+        winner ^= board.evaluate_one_called_number(15);
+        winner ^= board.evaluate_one_called_number(25);
+        winner ^= board.evaluate_one_called_number(27);
+        winner ^= board.evaluate_one_called_number(11);
+        winner ^= board.evaluate_one_called_number(35);
+        winner ^= board.evaluate_one_called_number(35); //no winner
+        winner ^= board.evaluate_one_called_number(99); //no winner
+        winner ^= board.evaluate_one_called_number(45); //should trigger winner
+        assert!(winner);
+    }
 }
