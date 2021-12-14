@@ -15,6 +15,8 @@ mod day5;
 use day5::*;
 mod day6;
 use day6::*;
+mod day7;
+use day7::*;
 use std::env;
 use std::process;
 
@@ -51,6 +53,10 @@ fn main() {
         6 => {
             result.push(day6_challenge1(&config).unwrap().into());
             result.push(day6_challenge2(&config).unwrap().try_into().unwrap());
+        }
+        7 => {
+            result.push(day7_challenge1(&config).unwrap());
+            result.push(day7_challenge2(&config).unwrap());
         }
         _ => {
             println!("Invalid challenge input. Exiting");
