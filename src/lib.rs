@@ -77,6 +77,14 @@ pub fn parse_string_line_into_integers(input: String, delimiter: char) -> Vec<u3
         .collect();
     numbers
 }
+pub fn parse_string_line_into_integers_usize(input: String, delimiter: char) -> Vec<usize> {
+    // let lines: Vec<&str> = input.lines().filter(|l| l != &"").collect();
+    let numbers: Vec<usize> = input
+        .split(&delimiter.to_string())
+        .map(|s| s.parse::<usize>().unwrap())
+        .collect();
+    numbers
+}
 
 // fn get_numbers_and_boards(file: &str) -> (Vec<u32>, Vec<BingoBoard>) {
 //     let file_contents = fs::read_to_string(file).unwrap();

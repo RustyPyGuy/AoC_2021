@@ -50,7 +50,6 @@ impl Mapper {
                     let mut temp_val: usize = self.mapped_points[x][y];
                     temp_val += 1;
                     self.mapped_points[x][y] = temp_val;
-                    // println!("mapped value vertical {}",self.mapped_points[x][y]);
                 }
             }
         }
@@ -62,14 +61,12 @@ impl Mapper {
                     let mut temp_val: usize = self.mapped_points[x][y];
                     temp_val += 1;
                     self.mapped_points[x][y] = temp_val;
-                    // println!("mapped value horizontal {}",self.mapped_points[x][y]);
                 }
             } else {
                 for x in input.c1.0..=input.c2.0 {
                     let mut temp_val: usize = self.mapped_points[x][y];
                     temp_val += 1;
                     self.mapped_points[x][y] = temp_val;
-                    // println!("mapped value horizontal {}",self.mapped_points[x][y]);
                 }
             }
         }
