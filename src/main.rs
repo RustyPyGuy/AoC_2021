@@ -19,6 +19,8 @@ mod day7;
 use day7::*;
 mod day8;
 use day8::*;
+mod day9;
+use day9::*;
 use std::env;
 use std::process;
 
@@ -63,6 +65,10 @@ fn main() {
         8 => {
             result.push(day8_challenge1(&config).unwrap());
             result.push(day8_challenge2(&config).unwrap());
+        }
+        9 => {
+            result.push(day9_challenge1(&config).unwrap());
+            result.push(day9_challenge2(&config).unwrap());
         }
         _ => {
             println!("Invalid challenge input. Exiting");
