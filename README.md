@@ -45,3 +45,6 @@ I'm a beginner and using this challenge to learn the language!
 #### Approach and Unique Features
 - The first challenge is a teaser where you just have to count how often specific patterns appear.
 - Challenge 1: Text processing and splitting followed by matches on character counts.
+
+### Day 9:
+To be completed.
