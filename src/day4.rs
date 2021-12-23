@@ -31,6 +31,7 @@ pub fn day4_challenge1(config: &Config) -> Result<i32, Error> {
     let mut is_winner: bool = false;
     let mut winning_score: u32 = 0;
     let mut sum_unmarked: u32 = 0;
+    println!("number of bingo cards: {}", bingo_cards.len());
     for called_number in &called_numbers {
         // for one_card in bingo_cards.iter_mut() {
         for (index, one_card) in bingo_cards.iter_mut().enumerate() {
