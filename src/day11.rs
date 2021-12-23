@@ -166,7 +166,7 @@ impl OGrid {
                 let mut temp_activations: usize = 0;
                 // let mut work_vec: Vec<(usize,usize)> = Vec::new();
                 // Here's the recursive portion.
-                println!("next_eval_vec: {:?}",next_eval_vec);
+                // println!("next_eval_vec: {:?}",next_eval_vec);
                 for coord in next_eval_vec.iter() {
                     flash_counter += recurse_eval(recurse_grid, flash_grid, *coord, &mut temp_activations);
                 }
@@ -197,7 +197,7 @@ pub fn day11_challenge1(config: &Config) -> Result<i128, Error> {
         }
     }
     // println!("grid map {:?}", grid_map);
-    println!("octos grid map {:#?}", octos.grid);
+    // println!("octos grid map {:#?}", octos.grid);
     // println!("grid map size {:?}", grid_map.size());
     for step in 1..=100 {
         println!("\n\nStarting Step {}",step);
@@ -216,20 +216,43 @@ pub fn day11_challenge1(config: &Config) -> Result<i128, Error> {
 
 pub fn day11_challenge2(config: &Config) -> Result<i128, Error> {
     // Create grid data structure for data input. Default value initialized high to detect errors.
-    let mut grid_map: Grid<usize> = Grid::init(GRID_Y_MAX, GRID_X_MAX, usize::MAX);
+    // let mut grid_map: Grid<usize> = Grid::init(GRID_Y_MAX, GRID_X_MAX, usize::MAX);
     // Create grid data structure for marking low points. Zero represents no mark.
-    let mut low_point_map: Grid<bool> = Grid::init(GRID_X_MAX + 2, GRID_Y_MAX + 2, false);
+    let mut octos = OGrid::new();
+    // let mut low_point_map: Grid<bool> = Grid::init(GRID_X_MAX, GRID_Y_MAX, false);
     // create variables for tracking totals and score.
-    let mut sum_low_points: usize = 0;
-    let mut total_score: usize = 0;
+    let mut total_flashes: usize = 0;
+    // let mut total_score: usize = 0;
     // read input puzzle file
     let input_string = read_prep_puzzle_file_contents_to_string(config);
     // read called numbers all on first line and assign to a vector.
     let lines = iterate_by_lines_from_string(&input_string);
     for (row, line) in lines.iter().enumerate() {
         for (col, digit) in line.chars().enumerate() {
-            grid_map[row][col] = digit.to_string().parse::<usize>().unwrap_or(55);
+            octos.grid[row][col] = digit.to_string().parse::<isize>().unwrap_or(1000);
         }
     }
-    Ok(0)
+    // println!("grid map {:?}", grid_map);
+    // println!("octos grid map {:#?}", octos.grid);
+    // println!("grid map size {:?}", grid_map.size());
+    let mut result: usize = 0;
+    let mut step: usize = 0;
+    while result == 0 {
+        step += 1;
+        // println!("\n\nStarting Step {}",step);
+        octos.increase_energy_full();
+        octos.evaluate();
+        total_flashes += octos.flashes_step;
+        println!(
+            "\n\nFor step {}\nFlashes this step: {} Total: {}\n octos grid map\n {:?}",
+            step, octos.flashes_step, total_flashes, octos.grid
+        );
+        if octos.flashes_step == 100 {
+            result = step;
+            break;
+        }
+    }
+    // fn increase_energy_level(self) {}
+    // println!("total number of flashes: {}", total_flashes);
+    Ok(result as i128)
 }
