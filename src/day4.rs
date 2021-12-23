@@ -80,12 +80,10 @@ pub fn day4_challenge2(config: &Config) -> Result<i32, Error> {
         }
         bingo_cards.push(working_bingo_card);
     }
-    let mut is_winner: bool = false;
-    let mut winning_score: u32 = 0;
     for called_number in &called_numbers {
-        for (index, one_card) in bingo_cards.iter_mut().enumerate() {
+        for (_index, one_card) in bingo_cards.iter_mut().enumerate() {
             // run all the numbers through all the cards. We check which is worst next.
-            is_winner = one_card.evaluate_one_called_number(*called_number);
+            one_card.evaluate_one_called_number(*called_number);
         }
     }
     let mut worst_card_index: usize = 0;
@@ -100,7 +98,7 @@ pub fn day4_challenge2(config: &Config) -> Result<i32, Error> {
     bingo_cards[worst_card_index].set_all_numbers_unmarked();
     let mut sum_unmarked: u32 = 0;
     for called_number in &called_numbers[0..worst_card_winning_number_index + 1] {
-        is_winner = bingo_cards[worst_card_index].evaluate_one_called_number(*called_number);
+        bingo_cards[worst_card_index].evaluate_one_called_number(*called_number);
     }
     let temp_vec = bingo_cards[worst_card_index].unmarked_numbers();
     for number in temp_vec.iter() {
@@ -122,7 +120,7 @@ pub fn day4_challenge2(config: &Config) -> Result<i32, Error> {
 pub struct BingoCard {
     card: Grid<MarkedNumber>, // Contains a vector grid of enums that indicate whether a number is marked.
     marked_numbers: Vec<u32>, // A vector that only contains marked numbers (somewhat redundant, but possibly useful)
-    card_complete: bool, // Stores state that the card is completely populated, again redundant.
+    // card_complete: bool, // Stores state that the card is completely populated, again redundant.
     winning_exists: bool, // Stores state that the card is a winner based on marked numbers.
     winning_input_index: u32, // Index of numbers called.  The number of numbers ingested for possible marking.
     first_win_index: usize, // The index of the input numbers that first triggers a win.  Upon winning, will not change unless the card is cleared.
@@ -131,35 +129,35 @@ impl BingoCard {
     pub fn new() -> Result<BingoCard, &'static str> {
         let card = Grid::new(5, 5);
         let marked_numbers = Vec::new();
-        let card_complete = false;
+        // let card_complete = false;
         let winning_exists = false;
         let winning_input_index = 0;
         let first_win_index = 0;
         Ok(BingoCard {
             card,
             marked_numbers,
-            card_complete,
+            // card_complete,
             winning_exists,
             winning_input_index,
             first_win_index,
         })
     }
-    pub fn init() -> Result<BingoCard, &'static str> {
-        let card = Grid::init(5, 5, MarkedNumber::None);
-        let marked_numbers = Vec::new();
-        let card_complete = false;
-        let winning_exists = false;
-        let winning_input_index = 0;
-        let first_win_index = 0;
-        Ok(BingoCard {
-            card,
-            marked_numbers,
-            card_complete,
-            winning_exists,
-            winning_input_index,
-            first_win_index,
-        })
-    }
+    // pub fn init() -> Result<BingoCard, &'static str> {
+    //     let card = Grid::init(5, 5, MarkedNumber::None);
+    //     let marked_numbers = Vec::new();
+    //     // let card_complete = false;
+    //     let winning_exists = false;
+    //     let winning_input_index = 0;
+    //     let first_win_index = 0;
+    //     Ok(BingoCard {
+    //         card,
+    //         marked_numbers,
+    //         // card_complete,
+    //         winning_exists,
+    //         winning_input_index,
+    //         first_win_index,
+    //     })
+    // }
     pub fn build_card_by_row(&mut self, input: Vec<u32>, row: usize) {
         let mut temp_row: Vec<MarkedNumber> = Vec::new();
         for number in input.iter() {
@@ -254,10 +252,10 @@ impl BingoCard {
         }
     }
 
-    pub fn export(self) -> Result<BingoCard, &'static str> {
-        println!("export method called returning struct {:?}", self);
-        Ok(self)
-    }
+    // pub fn export(self) -> Result<BingoCard, &'static str> {
+    //     println!("export method called returning struct {:?}", self);
+    //     Ok(self)
+    // }
 }
 #[derive(PartialEq, Eq, Debug, Clone)]
 enum MarkedNumber {

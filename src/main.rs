@@ -34,8 +34,10 @@ fn main() {
         process::exit(1);
     });
     if args.len() != 3 {
-        eprintln!("incorrect number of arguments. Must supply challenge number \
-            and input file name.");
+        eprintln!(
+            "incorrect number of arguments. Must supply challenge number \
+            and input file name."
+        );
         process::exit(1);
     }
     // NOTE: Need code for incorrect number of arguments

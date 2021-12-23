@@ -8,6 +8,8 @@ use bimap::BiHashMap;
 
 #[derive(Debug, Clone)]
 pub struct CodedData<'a> {
+    #[allow(dead_code)]
+    // not certain about input never being used.  the variable name is all over the code, so decided to play it safe and supress the warning.
     input: Vec<&'a str>,
     output: Vec<&'a str>,
 }
@@ -28,7 +30,6 @@ pub fn day8_challenge1(config: &Config) -> Result<i128, Error> {
             output: output_half,
         });
     }
-    // println!("{:?}", coded_data);
     let mut charcount: usize = 0;
     for one_line in coded_data.iter() {
         for segment in one_line.output.iter() {
@@ -47,12 +48,12 @@ pub fn day8_challenge1(config: &Config) -> Result<i128, Error> {
 }
 
 #[derive(Debug, Clone)]
-pub struct CodedData2<'a> {
+pub struct CodedData2 {
     // input: Vec<&'a str>,
     input: Vec<String>,
     output: Vec<String>,
-    translation: BiHashMap<&'a str, Option<usize>>,
-    translation2: BiHashMap<&'a str, &'a str>,
+    // translation: BiHashMap<&'a str, Option<usize>>,
+    // translation2: BiHashMap<&'a str, &'a str>,
 }
 pub fn day8_challenge2(config: &Config) -> Result<i128, Error> {
     // read input puzzle file
@@ -76,7 +77,7 @@ pub fn day8_challenge2(config: &Config) -> Result<i128, Error> {
 
         fn sort_character_chunks3<'a>(input: &'a Vec<String>) -> Vec<String> {
             let mut output_vec: Vec<String> = Vec::new();
-            for mut chunk in input.iter() {
+            for chunk in input.iter() {
                 let mut tempsort: Vec<char> = chunk.chars().collect();
                 tempsort.sort_unstable();
                 let tempsort2: String = tempsort.into_iter().collect();
@@ -88,8 +89,8 @@ pub fn day8_challenge2(config: &Config) -> Result<i128, Error> {
         coded_data.push(CodedData2 {
             input: sort_character_chunks3(&input_half2),
             output: sort_character_chunks3(&output_half2),
-            translation: BiHashMap::with_capacity(10),
-            translation2: BiHashMap::with_capacity(10),
+            // translation: BiHashMap::with_capacity(10),
+            // translation2: BiHashMap::with_capacity(10),
         });
     }
 
@@ -125,6 +126,7 @@ pub fn day8_challenge2(config: &Config) -> Result<i128, Error> {
             }
         }
         // closure to facilitate a comparison of character counts of a string
+        #[allow(non_snake_case)]
         let count_compare2 = |A: &str, B: &str| {
             let mut count: usize = 0;
             let B_ref = &temp_translation_map3.get_by_right(B);
@@ -176,10 +178,10 @@ pub fn day8_challenge2(config: &Config) -> Result<i128, Error> {
         for out_segment in one_line.output.iter() {
             // println!("out_segment {:?}", out_segment);
 
-            println!(
-                "out_decoded {:?}",
-                temp_translation_map2.get_by_left(out_segment.as_str()) /*.unwrap_or_else(||&"")*/
-            );
+            // println!(
+            //     "out_decoded {:?}",
+            //     temp_translation_map2.get_by_left(out_segment.as_str()) /*.unwrap_or_else(||&"")*/
+            // );
             decode_string_temp.push_str(
                 temp_translation_map2
                     .get_by_left(out_segment.as_str())

@@ -13,27 +13,18 @@ const MAX_INDEX_BOTT: usize = GRID_X_MAX - 1;
 pub struct OGrid {
     grid: Grid<isize>,
     flash_grid: Grid<bool>,
-    step: usize,
     flashes_step: usize,
-    remaining_eval: Vec<(usize, usize)>,
-    flag_new: bool,
 }
 impl OGrid {
     pub fn new() -> OGrid {
         let grid = Grid::new(GRID_Y_MAX, GRID_X_MAX);
-        let flash_grid = Grid::init(GRID_Y_MAX, GRID_X_MAX,false);
-        let step = 0;
+        let flash_grid = Grid::init(GRID_Y_MAX, GRID_X_MAX, false);
         let flashes_step = 0;
-        let remaining_eval = Vec::new();
-        let flag_new = false;
-        return OGrid {
+        OGrid {
             grid,
             flash_grid,
-            step,
             flashes_step,
-            remaining_eval,
-            flag_new,
-        };
+        }
     }
     pub fn increase_energy_full(&mut self) {
         for pod in self.grid.iter_mut() {
@@ -48,27 +39,26 @@ impl OGrid {
             for col in 0..GRID_X_MAX {
                 // perform recursive evalation of all fired points and surrounding points.
                 // self.flashes_step +=
-                    recurse_eval(&mut self.grid, &mut self.flash_grid, (row, col), &mut self.flashes_step);
+                recurse_eval(&mut self.grid, &mut self.flash_grid, (row, col));
             }
         }
         // set all points that flashed to 0
         for row in 0..GRID_Y_MAX {
             for col in 0..GRID_X_MAX {
                 // if self.grid[row][col] > 9 {
-                if self.flash_grid[row][col] == true {
+                if self.flash_grid[row][col] {
                     self.grid[row][col] = 0;
                     self.flashes_step += 1;
                 }
             }
         }
-            //reset the flash tracking matrix
-        self.flash_grid = Grid::init(GRID_Y_MAX, GRID_X_MAX,false);
+        //reset the flash tracking matrix
+        self.flash_grid = Grid::init(GRID_Y_MAX, GRID_X_MAX, false);
 
         fn recurse_eval(
             recurse_grid: &mut Grid<isize>,
             flash_grid: &mut Grid<bool>,
             row_col: (usize, usize),
-            activations: &mut usize,
         ) -> usize {
             // recursive function to evaluate a 3x3 grid or points based on the center coordinate of
             // row, column passed.
@@ -101,7 +91,7 @@ impl OGrid {
                 let mut sector_2 = Some((row_col.0.wrapping_sub(1), row_col.1));
                 let mut sector_3 = Some((row_col.0.wrapping_sub(1), row_col.1 + 1));
                 let mut sector_4 = Some((row_col.0, row_col.1.wrapping_sub(1)));
-                let sector_X = Some((row_col.0, row_col.1));
+                // let sector_X = Some((row_col.0, row_col.1));
                 let mut sector_6 = Some((row_col.0, row_col.1 + 1));
                 let mut sector_7 = Some((row_col.0 + 1, row_col.1.wrapping_sub(1)));
                 let mut sector_8 = Some((row_col.0 + 1, row_col.1));
@@ -146,15 +136,14 @@ impl OGrid {
                         // New flash
                         next_eval_vec.push(r_c);
                         flash_counter += 1;
-                        // flash_grid[r_c.0][r_c.1] = true;
                     } else {
-                        // no flash. increment only 
-                        // recurse_grid[r_c.0][r_c.1] += 1;
+                        // no flash. increment performed already.
                     }
                 };
                 for sector in [
                     sector_1, sector_2, sector_3, sector_4, sector_6, sector_7, sector_8, sector_9,
-                ].into_iter()
+                ]
+                .into_iter()
                 {
                     // if let sector_r_c = sector.unwrap_or_else(||{continue;});
                     if sector == None {
@@ -163,16 +152,14 @@ impl OGrid {
                         increment_test(sector.unwrap());
                     }
                 }
-                let mut temp_activations: usize = 0;
                 // let mut work_vec: Vec<(usize,usize)> = Vec::new();
                 // Here's the recursive portion.
                 // println!("next_eval_vec: {:?}",next_eval_vec);
                 for coord in next_eval_vec.iter() {
-                    flash_counter += recurse_eval(recurse_grid, flash_grid, *coord, &mut temp_activations);
+                    flash_counter += recurse_eval(recurse_grid, flash_grid, *coord);
                 }
 
-                // return next_eval_vec;
-                return flash_counter;
+                flash_counter
             }
         }
     }
@@ -196,21 +183,22 @@ pub fn day11_challenge1(config: &Config) -> Result<i128, Error> {
             octos.grid[row][col] = digit.to_string().parse::<isize>().unwrap_or(1000);
         }
     }
-    // println!("grid map {:?}", grid_map);
-    // println!("octos grid map {:#?}", octos.grid);
-    // println!("grid map size {:?}", grid_map.size());
+    println!("\n\n ---- CHALLENGE ONE ---- \n\n");
     for step in 1..=100 {
-        println!("\n\nStarting Step {}",step);
         octos.increase_energy_full();
         octos.evaluate();
         total_flashes += octos.flashes_step;
-        println!(
-            "\n\nFor step {}\nFlashes this step: {} Total: {}\n octos grid map\n {:?}",
+        if step < 11 {
+            println!(
+            "\n\nFirst 10 steps... For step {}\nFlashes this step: {} Total: {}\n octos grid map\n {:?}",
             step, octos.flashes_step, total_flashes, octos.grid
         );
+        }
     }
-    // fn increase_energy_level(self) {}
-    // println!("total number of flashes: {}", total_flashes);
+    println!(
+        "\n\nFinal step... Flashes this step: {} Total: {}\n octos grid map\n {:?}",
+        octos.flashes_step, total_flashes, octos.grid
+    );
     Ok(total_flashes as i128)
 }
 
@@ -232,22 +220,26 @@ pub fn day11_challenge2(config: &Config) -> Result<i128, Error> {
             octos.grid[row][col] = digit.to_string().parse::<isize>().unwrap_or(1000);
         }
     }
-    // println!("grid map {:?}", grid_map);
-    // println!("octos grid map {:#?}", octos.grid);
-    // println!("grid map size {:?}", grid_map.size());
     let mut result: usize = 0;
     let mut step: usize = 0;
+    println!("\n\n ---- CHALLENGE TWO ---- \n\n");
     while result == 0 {
         step += 1;
         // println!("\n\nStarting Step {}",step);
         octos.increase_energy_full();
         octos.evaluate();
         total_flashes += octos.flashes_step;
-        println!(
-            "\n\nFor step {}\nFlashes this step: {} Total: {}\n octos grid map\n {:?}",
+        if step < 11 {
+            println!(
+            "\n\nFirst 10 steps... For step {}\nFlashes this step: {} Total: {}\n octos grid map\n {:?}",
             step, octos.flashes_step, total_flashes, octos.grid
         );
+        }
         if octos.flashes_step == 100 {
+            println!(
+            "\n\nFinal step... For step {}\nFlashes this step: {} Total: {}\n octos grid map\n {:?}",
+            step, octos.flashes_step, total_flashes, octos.grid
+        );
             result = step;
             break;
         }

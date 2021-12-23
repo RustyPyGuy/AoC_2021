@@ -127,6 +127,7 @@ pub fn day5_challenge1(config: &Config) -> Result<i32, Error> {
     // read called numbers all on first line and assign to a vector.
     let lines = iterate_by_lines_from_string(&input_string);
     let mut sea_map = Mapper::new().unwrap();
+    #[allow(unused_assignments)]
     let mut input_integers: Vec<usize> = Vec::new();
     for line in lines.iter() {
         // parse the input lines.  Splits the input, filters and parses only for integers and
@@ -159,6 +160,7 @@ pub fn day5_challenge2(config: &Config) -> Result<i32, Error> {
     // read called numbers all on first line and assign to a vector.
     let lines = iterate_by_lines_from_string(&input_string);
     let mut sea_map = Mapper::new().unwrap();
+    #[allow(unused_assignments)]
     let mut input_integers: Vec<usize> = Vec::new();
     for line in lines.iter() {
         // parse the input lines.  Splits the input, filters and parses only for integers and

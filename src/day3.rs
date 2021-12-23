@@ -83,7 +83,7 @@ fn count_bits_puzzle2<'a>(
     //
     let mut line_vector: Vec<String> = Vec::new();
 
-    let mut leading_ones_list: Vec<String> = Vec::new();
+    // let leading_ones_list: Vec<String> = Vec::new();
     for line in file_buffer.unwrap().lines() {
         line_vector.push(line.unwrap());
     }
@@ -126,10 +126,10 @@ fn count_bits_puzzle2<'a>(
             return input_vector;
         }
         let digit_index: i32 = digit_index_option.unwrap_or(0); // digit under inspection.
-        let mut output_vector: Vec<String>;
+                                                                // let mut output_vector: Vec<String>;
         let mut leading_ones_list: Vec<String> = Vec::new();
         let mut leading_zeros_list: Vec<String> = Vec::new();
-        let mut selected_list: Vec<String>;
+        let selected_list: Vec<String>; // does not need to be mutable? perhaps becuase assignment below is the first assignment?
 
         for line in input_vector.iter() {
             let digit: Option<char> = Some(line.clone().remove(digit_index.try_into().unwrap()));
@@ -157,8 +157,8 @@ fn count_bits_puzzle2<'a>(
         }
         println!("length of selected list: {:?}", selected_list.len());
         // Recurse and advance the digit index.
-        output_vector = recurse_leading_digit_select(selected_list, profile, Some(digit_index + 1));
-        output_vector
+        recurse_leading_digit_select(selected_list, profile, Some(digit_index + 1))
+        // output_vector
     } //end fn definition
     Ok(propulsion)
 }
@@ -166,13 +166,13 @@ fn count_bits_puzzle2<'a>(
 // The launch functions
 pub fn day3_challenge1(config: &Config) -> Result<i32, Error> {
     let mut ship_propulsion = Propulsion::new().unwrap();
-    count_bits_puzzle1(config, &mut ship_propulsion);
+    count_bits_puzzle1(config, &mut ship_propulsion).expect("Challenge 1 run failure");
     println!("propulsion {:?}", ship_propulsion);
     Ok(ship_propulsion.gamma * ship_propulsion.epsilon)
 }
 
 pub fn day3_challenge2(config: &Config) -> Result<i32, Error> {
     let mut ship_propulsion = Propulsion::new().unwrap();
-    count_bits_puzzle2(config, &mut ship_propulsion);
+    count_bits_puzzle2(config, &mut ship_propulsion).expect("Challenge 2 run failure");
     Ok(ship_propulsion.oxygen * ship_propulsion.co2)
 }
